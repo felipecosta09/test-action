@@ -15,4 +15,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Docker Build
+      if: matrix.build == 'Container Build'
       run: docker build -t alpine .
+    - name: Docker Tag
+      if: matrix.tag == 'Container Tag'
+      run: docker tag alpine:latest alpine:1.0
