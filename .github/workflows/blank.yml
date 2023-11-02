@@ -6,17 +6,14 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        build: ["Container Build"]
-        tag: ["Container Tag"]
     steps:
     - uses: actions/checkout@v4
     - name: Docker Build
-      if: matrix.build == 'Container Build'
-      run: docker build -t alpine .
+      run: docker build -t alpine:v1 .
+  tag:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
     - name: Docker Tag
-      if: matrix.tag == 'Container Tag'
-      run: docker tag alpine:latest alpine:1.0
+      run: docker tag alpine:v1 ghcr.io/felipecosta09/alpine:v1
