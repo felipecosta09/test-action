@@ -3,6 +3,9 @@ name: Action
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
 env:
   FRONTEND: "frontend"
   BACKEND: "backend"
@@ -69,3 +72,45 @@ jobs:
           export TMAS_API_KEY=${{ secrets.TMAS_API_KEY }}
           docker save terminal:latest > image.tar
           tmas scan docker-archive:image.tar --malwareScan
+  push-frontend:
+    name: Push Frontend
+    runs-on: ubuntu-latest
+    needs: [scan-frontend]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Docker Push Frontend
+      run: |
+        docker build -t frontend:latest frontend/
+        docker tag frontend:latest ghcr.io/felipecosta09/frontend:latest
+        docker push ghcr.io/felipecosta09/frontend:latest
+  push-backend:
+    name: Push Backend
+    runs-on: ubuntu-latest
+    needs: [scan-backend]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Docker Push Backend
+      run: |
+        docker build -t backend:latest backend/
+        docker tag backend:latest ghcr.io/felipecosta09/backend:latest
+        docker push ghcr.io/felipecosta09/backend:latest
+  push-terminal:
+    name: Push Terminal
+    runs-on: ubuntu-latest
+    needs: [scan-terminal]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Docker Push Terminal
+      run: |
+        docker build -t terminal:latest terminal/
+        docker tag terminal:latest ghcr.io/felipecosta09/terminal:latest
+        docker push ghcr.io/felipecosta09/terminal:latest
+  unit-test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    needs: [push-frontend, push-backend, push-terminal]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Unit Test
+      run: |
+        echo "Unit Test"
