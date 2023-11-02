@@ -6,14 +6,32 @@ on:
 
 jobs:
   build:
+    name: Container Build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Docker Build
       run: docker build -t alpine:v1 .
-  tag:
+  scan:
+    name: Container Scan
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - uses: actions/checkout@v4
+      - name: Vision One Container Security Scan
+        run: |
+          docker build -t alpine:v1 .
+          cd scripts && chmod +x tmas_install.sh && ./tmas_install.sh
+          export TMAS_API_KEY=${{ secrets.TMAS_API_KEY }}
+          docker save alpine:v1 > image.tar
+          tmas scan docker-archive:image.tar --malwareScan
+  tag:
+    name: Push to ECR
+    runs-on: ubuntu-latest
+    needs: scan
+    steps:
+    - uses: actions/checkout@v4
+    - name: Docker Build
+      run: docker build -t alpine:v1 .
     - name: Docker Tag
       run: docker tag alpine:v1 ghcr.io/felipecosta09/alpine:v1
