@@ -80,6 +80,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Docker Push Frontend
       run: |
+        docker login ghcr.io -u felipecosta09 --password ${{ secrets.GITHUB_TOKEN }}
         docker build -t frontend:latest frontend/
         docker tag frontend:latest ghcr.io/felipecosta09/frontend:latest
         docker push ghcr.io/felipecosta09/frontend:latest
@@ -91,6 +92,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Docker Push Backend
       run: |
+        docker login ghcr.io -u felipecosta09 --password ${{ secrets.GITHUB_TOKEN }}
         docker build -t backend:latest backend/
         docker tag backend:latest ghcr.io/felipecosta09/backend:latest
         docker push ghcr.io/felipecosta09/backend:latest
@@ -102,6 +104,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Docker Push Terminal
       run: |
+        docker login ghcr.io -u felipecosta09 --password ${{ secrets.GITHUB_TOKEN }}
         docker build -t terminal:latest terminal/
         docker tag terminal:latest ghcr.io/felipecosta09/terminal:latest
         docker push ghcr.io/felipecosta09/terminal:latest
